@@ -23,8 +23,6 @@ const client = require("../configs/db");
 exports.signUp = async (req, res) => {
   const { name, email, password } = req.body;
 
-  // const isValid = temporaryData.findIndex((ele) => ele.email === email);
-
   try {
     //Check if user already exists
     //await just means asking the execution to wait till we get a response from the SQL query
@@ -38,19 +36,6 @@ exports.signUp = async (req, res) => {
         error: "User already exists.",
       });
     }
-
-    // const isValid = client
-    //   .query(`SELECT * FROM users where email = '${email}'`)
-    //   .then((data) => {
-    //     console.log(data);
-    //   });
-
-    // if (isValid !== -1) {
-    //   return res.status(400).json({
-    //     error: "User already exits.",
-    //   });
-    // }
-
     //Generate token
     const token = jwt.sign(
       {
@@ -81,13 +66,47 @@ exports.signUp = async (req, res) => {
   }
 };
 
-exports.signIn = (req, res) => {
-  //TODO: complete signIn
-  // Load hash from your password DB.
-  // bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
-  //     // result == true
-  // });
-  // bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
-  //     // result == false
-  // });
+exports.signIn = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const existingUser = await client.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email],
+    );
+
+    if (existingUser.rows.length === 0) {
+      return res.status(400).json({
+        error: "User does not exist. Sign-Up first.",
+      });
+    }
+    // cannot hash the password again to compare as each hash is unique
+    const user = existingUser.rows[0];
+
+    const isMatch = bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        error: "Invalid Credentials",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        email: email,
+      },
+      process.env.SECRET_KEY,
+    );
+
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
 };
