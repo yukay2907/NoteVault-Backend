@@ -18,10 +18,6 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoutes);
 
-client.connect(() => {
-  console.log("Connected to database");
-});
-
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });

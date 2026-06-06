@@ -65,7 +65,7 @@ exports.signUp = async (req, res) => {
     //Save user in database
     await client.query(
       "INSERT INTO users(name,email,password) VALUES($1,$2,$3)",
-      [name, email, password],
+      [name, email, hash],
     );
 
     return res.status(201).json({
