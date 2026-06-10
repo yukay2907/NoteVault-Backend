@@ -84,3 +84,32 @@ exports.deleteNote = (req, res) => {
       });
     });
 };
+
+exports.getNoteById = (req, res) => {
+  const noteId = req.noteId;
+
+  pool
+    .query("SELECT noteid, heading, content FROM notes WHERE noteid = $1", [
+      noteId,
+    ])
+    .then((data) => {
+      if (data.rows.length === 0) {
+        return res.status(404).json({
+          message: "Note not found",
+        });
+      }
+
+      res.status(200).json({
+        noteId: data.rows[0].noteid,
+        heading: data.rows[0].heading,
+        content: data.rows[0].content,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+
+      res.status(500).json({
+        message: "Database error occured",
+      });
+    });
+};

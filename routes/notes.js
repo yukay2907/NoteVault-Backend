@@ -4,6 +4,7 @@ const {
   getAllNotes,
   updateNote,
   deleteNote,
+  getNoteById,
 } = require("../controllers/notes");
 const { verifyToken } = require("../middlewares/authMiddleware");
 const { handleNoteIdParam } = require("../middlewares/noteMiddleware");
@@ -13,6 +14,7 @@ router.param("noteId", handleNoteIdParam);
 
 router.post("/add", verifyToken, addNote);
 router.get("/getallnotes", verifyToken, getAllNotes);
+router.get("/:noteId", verifyToken, getNoteById);
 router.put("/update/:noteId", verifyToken, updateNote);
 router.delete("/delete/:noteId", verifyToken, deleteNote);
 
