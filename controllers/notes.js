@@ -89,9 +89,10 @@ exports.getNoteById = (req, res) => {
   const noteId = req.noteId;
 
   pool
-    .query("SELECT noteid, heading, content FROM notes WHERE noteid = $1", [
-      noteId,
-    ])
+    .query(
+      "SELECT noteid, heading, content FROM notes WHERE noteid = $1 AND email $2",
+      [noteId, req.email],
+    )
     .then((data) => {
       if (data.rows.length === 0) {
         return res.status(404).json({
