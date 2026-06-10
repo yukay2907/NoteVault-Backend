@@ -80,10 +80,10 @@ exports.signIn = async (req, res) => {
         error: "User does not exist. Sign-Up first.",
       });
     }
-    // cannot hash the password again to compare as each hash is unique
+
     const user = existingUser.rows[0];
 
-    const isMatch = bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({
@@ -101,6 +101,7 @@ exports.signIn = async (req, res) => {
     return res.status(200).json({
       message: "Login successful",
       token,
+      name: user.name,
     });
   } catch (error) {
     console.log(error);
