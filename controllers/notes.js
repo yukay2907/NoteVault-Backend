@@ -28,7 +28,7 @@ exports.getAllNotes = (req, res) => {
       const noteData = data.rows;
       const filteredData = noteData.map((note) => {
         return {
-          noteId: note.noteid,
+          noteId: note.id,
           heading: note.heading,
           content: note.content,
         };
@@ -50,7 +50,7 @@ exports.updateNote = (req, res) => {
   const noteId = req.noteId;
   const { heading, content } = req.body;
   pool
-    .query("UPDATE notes SET heading = $1, content = $2 WHERE noteid = $3", [
+    .query("UPDATE notes SET heading = $1, content = $2 WHERE id = $3", [
       heading,
       content,
       noteId,
@@ -71,7 +71,7 @@ exports.updateNote = (req, res) => {
 exports.deleteNote = (req, res) => {
   const noteId = req.noteId;
   pool
-    .query("DELETE FROM notes WHERE noteid = $1", [noteId])
+    .query("DELETE FROM notes WHERE id = $1", [noteId])
     .then(() => {
       res.status(200).json({
         message: "Note successfully deleted.",
@@ -90,7 +90,7 @@ exports.getNoteById = (req, res) => {
 
   pool
     .query(
-      "SELECT noteid, heading, content FROM notes WHERE noteid = $1 AND email $2",
+      "SELECT noteid, heading, content FROM notes WHERE id = $1 AND email $2",
       [noteId, req.email],
     )
     .then((data) => {
